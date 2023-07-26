@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- <h1>Upload Crime Data</h1> -->
+    <form id="uploadForm" action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv">
+        <input type="submit" value="Analyze">
+    </form>
+
+    <div id="status" style="display: none;">
+        <p><strong>Analysis in Progress...</strong></p>
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
+    <div id="graphContainer" style="display: none;">
+        <!-- <h2>Scatter Graph</h2>  -->
+        <div id="scatterGraph">
+            <img id="graphImg" src="" alt="Scatter Graph" style="max-width: 50%;">
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $("#uploadForm").submit(function(event) {
+                event.preventDefault();
+                $("#uploadForm").hide();
+                $("#status").show();
+
+                $.ajax({
+                    url: "/upload",
+                    type: "POST",
+                    data: new FormData(this),
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        if (response.status === "processing") {
+                            checkAnalysisStatus();
+                        }
+                    },
+                    error: function() {
+                        alert("An error occurred while uploading the file.");
+                    }
+                });
+            });
+
+            function checkAnalysisStatus() {
+                $.ajax({
+                    url: "/analyze",
+                    type: "GET",
+                    data: { filename: "crime.csv" }, // Replace with the actual filename
+                    success: function(response) {
+                        if (response.status === "done") {
+                            $("#status").hide();
+                            $("#graphContainer").show();
+                            $("#graphImg").attr("src", response.graph_filename);
+                        } else {
+                            setTimeout(checkAnalysisStatus, 1000); // Check again after 1 second
+                        }
+                    },
+                    error: function() {
+                        alert("An error occurred while analyzing the data.");
+                    }
+                });
+            }
+        });
+    </script>
+   {% endblock %}
