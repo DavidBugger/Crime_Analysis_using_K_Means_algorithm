@@ -260,6 +260,7 @@ def analyze():
             crime_trends[col] = trend
 
         # Create a scatter plot using Matplotlib
+        scatter_plot = plt.figure(figsize=(10, 6))
         plt.scatter(crime_data["Year"], crime_data["Murder Rate"], label="Murder Rate")
         plt.scatter(crime_data["Year"], crime_data["Rape Rate"], label="Rape Rate")
         plt.scatter(crime_data["Year"], crime_data["Robbery Rate"], label="Robbery Rate")
@@ -269,15 +270,47 @@ def analyze():
         plt.legend()
         plt.xticks(rotation=45)
         plt.tight_layout()
-        graph_filename = f"static/crime_scatter_plot.png"
-        plt.savefig(graph_filename)
-        plt.close()
+        scatter_graph_filename = f"static/crime_scatter_plot.png"
+        scatter_plot.savefig(scatter_graph_filename)
+        plt.close(scatter_plot)
 
-        # Return a JSON response indicating that the analysis is done and provide the graph filename
-        return jsonify({"status": "done", "graph_filename": graph_filename, "crime_trends": crime_trends})
+        # Create a bar chart using Matplotlib
+        bar_chart = plt.figure(figsize=(10, 6))
+        plt.bar(crime_data["Year"], crime_data["Murder Rate"], label="Murder Rate")
+        plt.bar(crime_data["Year"], crime_data["Rape Rate"], label="Rape Rate")
+        plt.bar(crime_data["Year"], crime_data["Robbery Rate"], label="Robbery Rate")
+        plt.xlabel("Year")
+        plt.ylabel("Crime Rate per 100,000 People")
+        plt.title("Crime Rates Bar Chart")
+        plt.legend()
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        bar_graph_filename = f"static/crime_bar_chart.png"
+        bar_chart.savefig(bar_graph_filename)
+        plt.close(bar_chart)
+        # Create a pie chart using Matplotlib
+        pie_chart = plt.figure(figsize=(8, 8))
+        labels = ["Murder", "Rape", "Robbery"]
+        sizes = [crime_data["Murder"].sum(), crime_data["Rape"].sum(), crime_data["Robbery"].sum()]
+        plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=140)
+        plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        pie_graph_filename = f"static/crime_pie_chart.png"
+        pie_chart.savefig(pie_graph_filename)
+        plt.close(pie_chart)
+
+        # Return a JSON response indicating that the analysis is done and provide the graph filenames
+        return jsonify({
+            "status": "done",
+            "scatter_graph_filename": scatter_graph_filename,
+            "bar_graph_filename": bar_graph_filename,
+            "pie_graph_filename": pie_graph_filename,
+            "crime_trends": crime_trends
+        })
 
     # If the file does not exist in the database, show an error message or redirect to the upload page.
     return "File not found in the database. Please upload the file first.", 404
+
+
 
 
 

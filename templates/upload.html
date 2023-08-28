@@ -4,11 +4,24 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
-    <!-- <h1>Upload Crime Data</h1> -->
+    <!-- <h1>Upload Crime Data</h1>
     <form id="uploadForm" action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
         <input type="file" name="file" accept=".csv">
         <input type="submit" value="Analyze">
-    </form>
+    </form> -->
+
+    <div class="container mt-4" style="background-image: url('assets/img/bg/bg.png');">
+        <h1>Crime Analysis</h1>
+        <form method="POST" id="uploadForm"  action="{{ url_for('upload') }}" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="firstname">Upload Crime Data</label>
+                <input type="file" class="form-control" name="file"  accept=".csv">
+            </div>
+            <button type="submit" class="btn btn-primary">Analyze</button>
+        </form>
+    </div>
+
+
 
     <div id="status" style="display: none;">
         <p><strong>Analysis in Progress...</strong></p>
@@ -17,12 +30,44 @@
         </div>
     </div>
 
-    <div id="graphContainer" style="display: none;">
-        <!-- <h2>Scatter Graph</h2>  -->
-        <div id="scatterGraph">
-            <img id="graphImg" src="" alt="Scatter Graph" style="max-width: 50%;">
+    <div id="status" style="display: none;">
+        <p><strong>Analysis in Progress...</strong></p>
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
         </div>
     </div>
+
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div id="graphContainer" style="display: none;">
+                <!-- <h2>Scatter Graph</h2> -->
+                <div id="scatterGraph">
+                    <img id="scatterGraphImg" src="" alt="Scatter Graph" class="img-fluid">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div id="barContainer" style="display: none;">
+                <!-- <h2>Pie Chart</h2> -->
+                <div id="barChart">
+                    <img id="barChartImg" src="" alt="Bar Chart" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+  
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div id="pieContainer" style="display: none;">
+                <!-- <h2>Pie Chart</h2> -->
+                <div id="pieChart">
+                    <img id="pieChartImg" src="" alt="Pie Chart" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
     <script>
         $(document).ready(function() {
@@ -57,7 +102,11 @@
                         if (response.status === "done") {
                             $("#status").hide();
                             $("#graphContainer").show();
-                            $("#graphImg").attr("src", response.graph_filename);
+                            $("#barContainer").show();
+                            $("#pieContainer").show();
+                            $("#scatterGraphImg").attr("src", response.scatter_graph_filename);
+                            $("#barChartImg").attr("src", response.bar_graph_filename);
+                            $("#pieChartImg").attr("src", response.pie_graph_filename);
                         } else {
                             setTimeout(checkAnalysisStatus, 1000); // Check again after 1 second
                         }
@@ -69,4 +118,4 @@
             }
         });
     </script>
-   {% endblock %}
+{% endblock %}
